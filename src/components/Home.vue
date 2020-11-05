@@ -24,17 +24,17 @@
           notifications: new Set(),
           selectedProducts: new Map(), // productid to quantity
           selectedDiscounts: new Map(), // disocuntid to product in offer id
-          selectedProductsStringified: '',
-          selectedDiscountsStringified: '',
-          stringifiedTransactionDate: '',
-          stringifiedOrderDate: '',
+          selectedProductsStringified: "",
+          selectedDiscountsStringified: "",
+          stringifiedTransactionDate: "",
+          stringifiedOrderDate: "",
           selectedProductsInNewStore: [],
           pushSocket: null
         },
         config: {
           debug: {
             resize: false,
-            logLevel: 10
+            logLevel: 0
           },
           css: {
             grid: true,
@@ -54,6 +54,7 @@
         console.log("asd")
         this.viewModel.selectedProducts[this.viewModel.selectedProduct.id] = this.viewModel.productQuantity
         this.viewModel.selectedProductsStringified = JSON.stringify(this.viewModel.selectedProducts)
+        this.viewModel.selectedDiscountsStringified = JSON.stringify(this.viewModel.selectedDiscounts)
       },
       confirmDiscountAllOrNothing() {
         // check if the chosen offers for the discount list is initialized already or not
@@ -80,6 +81,7 @@
         this.viewModel.selectedProducts = new Map()
         this.viewModel.selectedDiscountsStringified = ''
         this.viewModel.selectedProductsStringified = ''
+        this.viewModel.selectedDiscountsStringified = JSON.stringify(this.viewModel.selectedDiscounts)
       },
       addProductToNewStore() {
         if (!this.viewModel.selectedProductsInNewStore.map(selected => selected.id).includes(this.viewModel
@@ -123,11 +125,10 @@
       connectToSocket() {
         if (!this.viewModel.loginResponse.uuid ||
           (this.viewModel.pushSocket && this.viewModel.pushSocket.readyState === WebSocket.OPEN)) {
-          console.log('no uuid')
           return;
         }
         this.viewModel.pushSocket = new WebSocket(
-          `ws://localhost:8080/SDM/api/push?uuid=${this.viewModel.loginResponse.uuid}`)
+          `ws://localhost:8080/SDM/api/push/${this.viewModel.loginResponse.uuid}`)
         this.viewModel.pushSocket.onmessage = async () => {
           const beforePull = this.viewModel.notifications.size
           const notifications =
@@ -137,10 +138,6 @@
           this.viewModel.numberOfNotifications = this.viewModel.notifications.size - beforePull
         }
       }
-    },
-    onXmlUpload() {
-      console.log("hey")
-      this.viewModel.xmlFile = "" + this.viewModel.xmlFile
     }
   }
 </script>
