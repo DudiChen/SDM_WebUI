@@ -55,6 +55,7 @@
         this.viewModel.selectedProducts[this.viewModel.selectedProduct.id] = this.viewModel.productQuantity
         this.viewModel.selectedProductsStringified = JSON.stringify(this.viewModel.selectedProducts)
         this.viewModel.selectedDiscountsStringified = JSON.stringify(this.viewModel.selectedDiscounts)
+        this.viewModel.productQuantity = 0
       },
       confirmDiscountAllOrNothing() {
         // check if the chosen offers for the discount list is initialized already or not
