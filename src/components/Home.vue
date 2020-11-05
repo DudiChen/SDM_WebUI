@@ -1,0 +1,142 @@
+<template>
+  <div class="home debug">
+    <QUX :app="hash" :config="config" :showDebug="true" v-model="viewModel" />
+  </div>
+</template>
+<style lang="scss">
+  .home {
+    height: 100%;
+  }
+</style>
+
+<script>
+  import Vue from "vue";
+  import QUX from 'vue-low-code'
+  import axios from 'axios'
+  Vue.use(QUX);
+
+  export default {
+    name: 'home',
+    data: function () {
+      return {
+        hash: "a2aa10aypCe57tVhNvvWifUHQHJ8eHnFIWXv9wIfZ7f8KJhUKEod04nuf6W6",
+        viewModel: {
+          notifications: new Set(),
+          selectedProducts: new Map(), // productid to quantity
+          selectedDiscounts: new Map(), // disocuntid to product in offer id
+          selectedProductsStringified: '',
+          selectedDiscountsStringified: '',
+          stringifiedTransactionDate: '',
+          stringifiedOrderDate: '',
+          selectedProductsInNewStore: [],
+          pushSocket: null
+        },
+        config: {
+          debug: {
+            resize: false,
+            logLevel: 10
+          },
+          css: {
+            grid: true,
+            justifyContentInWrapper: true
+          },
+          router: {
+            key: 'screenName',
+            prefix: ''
+          }
+        },
+        showPayload: false
+      }
+    },
+    components: {},
+    methods: {
+      updateProductChoise() {
+        console.log("asd")
+        this.viewModel.selectedProducts[this.viewModel.selectedProduct.id] = this.viewModel.productQuantity
+        this.viewModel.selectedProductsStringified = JSON.stringify(this.viewModel.selectedProducts)
+      },
+      confirmDiscountAllOrNothing() {
+        // check if the chosen offers for the discount list is initialized already or not
+        if (!this.viewModel.selectedDiscounts[this.viewModel.selectedDiscount.name].length ||
+          !(this.viewModel.selectedDiscounts[this.viewModel.selectedDiscount.name] instanceof Array)) {
+          this.viewModel.selectedDiscounts[this.viewModel.selectedDiscount.name] = []
+        }
+        this.viewModel.selectedDiscounts[this.viewModel.selectedDiscount.name] = this.viewModel.selectedDiscount.offers
+          .map(offer => offer.productId)
+        this.viewModel.selectedDiscountsStringified = JSON.stringify(this.viewModel.selectedDiscounts)
+      },
+      confirmDiscountOneOf() {
+        // check if the chosen offers for the discount list is initialized already or not
+        if (!this.viewModel.selectedDiscounts[this.viewModel.selectedDiscount.name].length ||
+          !(this.viewModel.selectedDiscounts[this.viewModel.selectedDiscount.name] instanceof Array)) {
+          this.viewModel.selectedDiscounts[this.viewModel.selectedDiscount.name] = []
+        }
+        this.viewModel.selectedDiscounts[this.viewModel.selectedDiscount.name].push(this.viewModel.selectedOffer
+          .productId);
+        this.viewModel.selectedDiscountsStringified = JSON.stringify(this.viewModel.selectedDiscounts)
+      },
+      clearOrderAndDiscounts() {
+        this.viewModel.selectedDiscounts = new Map()
+        this.viewModel.selectedProducts = new Map()
+        this.viewModel.selectedDiscountsStringified = ''
+        this.viewModel.selectedProductsStringified = ''
+      },
+      addProductToNewStore() {
+        if (!this.viewModel.selectedProductsInNewStore.map(selected => selected.id).includes(this.viewModel
+            .chosenNewStoreProduct.id)) {
+          this.viewModel.selectedProductsInNewStore.push({
+            id: this.viewModel.chosenNewStoreProduct.id,
+            price: 0
+          })
+        }
+      },
+      sumOffers() {
+        this.viewModel.sumOfOffersAdditionalCost =
+          this.viewModel.selectedDiscount.offers
+          .map(offer => offer.additionalCost)
+          .reduce((a, b) => a + b, 0)
+      },
+      stringifyDate() {
+        const d = this.viewModel.transactionDate
+        const dformat = [
+          d.getDate(),
+          d.getMonth() + 1,
+          d.getFullYear()
+        ].join('/') + ' ' + [d.getHours(),
+          d.getMinutes(),
+          d.getSeconds()
+        ].join(':');
+        this.viewModel.stringifiedTransactionDate = dformat
+      },
+      onOrderDateChanged() {
+        const d = this.viewModel.orderDate
+        const dformat = [
+          d.getDate(),
+          d.getMonth() + 1,
+          d.getFullYear()
+        ].join('/') + ' ' + [d.getHours(),
+          d.getMinutes(),
+          d.getSeconds()
+        ].join(':');
+        this.viewModel.stringifiedOrderDate = dformat
+      },
+      connectToSocket() {
+        if (!this.viewModel.loginResponse.uuid ||
+          (this.viewModel.pushSocket && this.viewModel.pushSocket.readyState === WebSocket.OPEN)) {
+          console.log('no uuid')
+          return;
+        }
+        this.viewModel.pushSocket = new WebSocket(
+          `ws://localhost:8080/SDM/api/push?uuid=${this.viewModel.loginResponse.uuid}`)
+        this.viewModel.pushSocket.onmessage = async () => {
+          const beforePull = this.viewModel.notifications.size
+          const notifications =
+            await axios.get(
+              `http://localhost:8080/SDM/api/users/notifications/?uuid=${this.viewModel.loginResponse.uuid}`);
+          notifications.allNotifications.forEach(notification => this.viewModel.notifications.add(notification))
+          this.viewModel.numberOfNotifications = this.viewModel.notifications.size - beforePull
+        }
+      }
+    }
+  }
+</script>
