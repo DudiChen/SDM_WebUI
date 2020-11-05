@@ -137,6 +137,10 @@
           this.viewModel.numberOfNotifications = this.viewModel.notifications.size - beforePull
         }
       }
+    },
+    onXmlUpload() {
+      console.log("hey")
+      this.viewModel.xmlFile = "" + this.viewModel.xmlFile
     }
   }
 </script>
