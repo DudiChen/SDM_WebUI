@@ -31,6 +31,7 @@
           stringifiedTransactionDate: "",
           stringifiedOrderDate: "",
           selectedProductsInNewStore: [],
+          selectedProductsInNewStoreForSend: [],
           pushSocket: null
         },
         config: {
@@ -97,10 +98,16 @@
         if (!this.viewModel.selectedProductsInNewStore.map(selected => selected.id).includes(this.viewModel
             .chosenNewStoreProduct.id)) {
           this.viewModel.selectedProductsInNewStore.push({
+            id: this.viewModel.chosenNewStoreProduct.id,
             name: this.viewModel.chosenNewStoreProduct.name,
             price: 0
           })
-          console.log(this.viewModel.selectedProductsInNewStore);
+          this.viewModel.selectedProductsInNewStoreForSend.push(JSON.stringify({
+            id: this.viewModel.chosenNewStoreProduct.id,
+            name: this.viewModel.chosenNewStoreProduct.name,
+            price: 0
+          }))
+          this.viewModel.selectedProductsInNewStoreForSend = JSON.stringify(this.viewModel.selectedProductsInNewStore)
         }
       },
       sumOffers() {
