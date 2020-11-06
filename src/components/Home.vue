@@ -24,6 +24,7 @@
           notifications: new Set(),
           selectedProducts: new Map(), // productid to quantity
           selectedProductsInAreaDisplay: [],
+          notificationsArr: [],
           selectedDiscounts: new Map(), // disocuntid to product in offer id
           selectedProductsStringified: "",
           selectedDiscountsStringified: "",
@@ -91,12 +92,15 @@
         this.viewModel.selectedDiscountsStringified = JSON.stringify(this.viewModel.selectedDiscounts)
       },
       addProductToNewStore() {
+        console.log('this.viewModel.chosenNewStoreProduct')
+        console.log(this.viewModel.chosenNewStoreProduct)
         if (!this.viewModel.selectedProductsInNewStore.map(selected => selected.id).includes(this.viewModel
             .chosenNewStoreProduct.id)) {
           this.viewModel.selectedProductsInNewStore.push({
-            id: this.viewModel.chosenNewStoreProduct.id,
+            name: this.viewModel.chosenNewStoreProduct.name,
             price: 0
           })
+          console.log(this.viewModel.selectedProductsInNewStore);
         }
       },
       sumOffers() {
@@ -140,10 +144,18 @@
           const beforePull = this.viewModel.notifications.size
           const notifications =
             await axios.get(
-              `http://localhost:8080/SDM/api/users/notifications/?uuid=${this.viewModel.loginResponse.uuid}`);
-          notifications.allNotifications.forEach(notification => this.viewModel.notifications.add(notification))
+              `http://localhost:8080/SDM/api/users/notifications?uuid=${this.viewModel.loginResponse.uuid}`);
+          notifications.data.allNotifications.forEach(notification => this.viewModel.notifications.add(notification))
+          this.viewModel.notificationsArr = [...this.viewModel.notifications].map(notification => {return {'description': notification.description}})
+          console.log(this.viewModel.notificationsArr)
           this.viewModel.numberOfNotifications = this.viewModel.notifications.size - beforePull
         }
+      },
+      makeNotificationsZero() {
+        this.viewModel.numberOfNotifications = undefined;
+      },
+      deleteChosenProductsForStore() {
+        this.viewModel.selectedProductsInNewStore = []
       }
     }
   }
