@@ -108,11 +108,6 @@
             name: this.viewModel.chosenNewStoreProduct.name,
             price: 0
           })
-          this.viewModel.selectedProductsInNewStoreForSend.push(JSON.stringify({
-            id: this.viewModel.chosenNewStoreProduct.id,
-            name: this.viewModel.chosenNewStoreProduct.name,
-            price: 0
-          }))
           this.viewModel.selectedProductsInNewStoreForSend = JSON.stringify(this.viewModel.selectedProductsInNewStore)
         }
       },
