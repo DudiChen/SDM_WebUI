@@ -32,6 +32,7 @@
           stringifiedOrderDate: "",
           selectedProductsInNewStore: [],
           selectedProductsInNewStoreForSend: [],
+          cart: [],
           pushSocket: null
         },
         config: {
@@ -59,10 +60,14 @@
         this.viewModel.selectedProductsStringified = JSON.stringify(this.viewModel.selectedProducts)
         this.viewModel.selectedDiscountsStringified = JSON.stringify(this.viewModel.selectedDiscounts)
         this.viewModel.selectedProductsInAreaDisplay = this.viewModel.allProductsInAreaResponse.allProducts
-        .filter(product => this.viewModel.selectedProducts[product.id] !== undefined)
+          .filter(product => this.viewModel.selectedProducts[product.id] !== undefined)
         this.viewModel.selectedProductsInAreaDisplay
-        .find(product => product.id === this.viewModel.selectedProduct.id)
-        .quantity = this.viewModel.productQuantity
+          .find(product => product.id === this.viewModel.selectedProduct.id)
+          .quantity = this.viewModel.productQuantity
+        const objectInCart = Object.create(this.viewModel.selectedProductsInAreaDisplay
+          .find(product => product.id === this.viewModel.selectedProduct.id))
+        objectInCart.quantity = this.viewModel.productQuantity
+        this.viewModel.cart.push(objectInCart)
         this.viewModel.productQuantity = 0
       },
       confirmDiscountAllOrNothing() {
@@ -91,6 +96,7 @@
         this.viewModel.selectedDiscountsStringified = ''
         this.viewModel.selectedProductsStringified = ''
         this.viewModel.selectedDiscountsStringified = JSON.stringify(this.viewModel.selectedDiscounts)
+        this.viewModel.cart = []
       },
       addProductToNewStore() {
         console.log('this.viewModel.chosenNewStoreProduct')
@@ -148,15 +154,23 @@
         this.viewModel.pushSocket = new WebSocket(
           `ws://localhost:8080/SDM/api/push/${this.viewModel.loginResponse.uuid}`)
         this.viewModel.pushSocket.onmessage = async () => {
-          const beforePull = this.viewModel.notifications.size
-          const notifications =
-            await axios.get(
-              `http://localhost:8080/SDM/api/users/notifications?uuid=${this.viewModel.loginResponse.uuid}`);
-          notifications.data.allNotifications.forEach(notification => this.viewModel.notifications.add(notification))
-          this.viewModel.notificationsArr = [...this.viewModel.notifications].map(notification => {return {'description': notification.description}})
-          console.log(this.viewModel.notificationsArr)
-          this.viewModel.numberOfNotifications = this.viewModel.notifications.size - beforePull
+          await this.getNotifications()
         }
+      },
+      async getNotifications() {
+        this.viewModel.notifications = new Set()
+        const beforePull = this.viewModel.notifications.size
+        const notifications =
+          await axios.get(
+            `http://localhost:8080/SDM/api/users/notifications?uuid=${this.viewModel.loginResponse.uuid}`);
+        notifications.data.allNotifications.forEach(notification => this.viewModel.notifications.add(notification))
+        this.viewModel.notificationsArr = [...this.viewModel.notifications].map(notification => {
+          return {
+            'description': notification.description
+          }
+        })
+        console.log(this.viewModel.notificationsArr)
+        this.viewModel.numberOfNotifications = this.viewModel.notifications.size - beforePull
       },
       makeNotificationsZero() {
         this.viewModel.numberOfNotifications = undefined;
