@@ -23,6 +23,7 @@
         viewModel: {
           notifications: new Set(),
           selectedProducts: new Map(), // productid to quantity
+          selectedProductsInAreaDisplay: [],
           selectedDiscounts: new Map(), // disocuntid to product in offer id
           selectedProductsStringified: "",
           selectedDiscountsStringified: "",
@@ -55,6 +56,11 @@
         this.viewModel.selectedProducts[this.viewModel.selectedProduct.id] = this.viewModel.productQuantity
         this.viewModel.selectedProductsStringified = JSON.stringify(this.viewModel.selectedProducts)
         this.viewModel.selectedDiscountsStringified = JSON.stringify(this.viewModel.selectedDiscounts)
+        this.viewModel.selectedProductsInAreaDisplay = this.viewModel.allProductsInAreaResponse.allProducts
+        .filter(product => this.viewModel.selectedProducts[product.id] !== undefined)
+        this.viewModel.selectedProductsInAreaDisplay
+        .find(product => product.id === this.viewModel.selectedProduct.id)
+        .quantity = this.viewModel.productQuantity
         this.viewModel.productQuantity = 0
       },
       confirmDiscountAllOrNothing() {
