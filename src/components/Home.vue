@@ -55,8 +55,15 @@
     components: {},
     methods: {
       updateProductChoise() {
-        console.log("asd")
-        this.viewModel.selectedProducts[this.viewModel.selectedProduct.id] = this.viewModel.productQuantity
+        if(this.viewModel.productQuantity === 0) {
+          return 
+        }
+        if(this.viewModel.selectedProducts[this.viewModel.selectedProduct.id]) {
+          this.viewModel.selectedProducts[this.viewModel.selectedProduct.id] += this.viewModel.productQuantity
+        }
+        else {
+          this.viewModel.selectedProducts[this.viewModel.selectedProduct.id] = this.viewModel.productQuantity
+        }
         this.viewModel.selectedProductsStringified = JSON.stringify(this.viewModel.selectedProducts)
         this.viewModel.selectedDiscountsStringified = JSON.stringify(this.viewModel.selectedDiscounts)
         this.viewModel.selectedProductsInAreaDisplay = this.viewModel.allProductsInAreaResponse.allProducts
@@ -67,7 +74,11 @@
         const objectInCart = Object.create(this.viewModel.selectedProductsInAreaDisplay
           .find(product => product.id === this.viewModel.selectedProduct.id))
         objectInCart.quantity = this.viewModel.productQuantity
-        this.viewModel.cart.push(objectInCart)
+        if(this.viewModel.cart.find(o => o.id === objectInCart.id)) {
+            this.viewModel.cart.find(o => o.id === objectInCart.id).quantity += this.viewModel.productQuantity
+        } else {
+            this.viewModel.cart.push(objectInCart)
+        }
         this.viewModel.productQuantity = 0
       },
       confirmDiscountAllOrNothing() {
@@ -172,6 +183,12 @@
       },
       deleteChosenProductsForStore() {
         this.viewModel.selectedProductsInNewStore = []
+      },
+      removeProductFromCart() {
+        console.log(this.viewModel.productToRemoveFromCart)
+        delete this.viewModel.selectedDiscounts[this.viewModel.productToRemoveFromCart.id]
+        this.viewModel.selectedProductsStringified = JSON.stringify(this.viewModel.selectedProducts)
+        this.viewModel.cart = this.viewModel.cart.filter(product => product.id !== this.viewModel.productToRemoveFromCart.id)
       }
     }
   }
