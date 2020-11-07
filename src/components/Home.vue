@@ -132,7 +132,7 @@
         }
       },
       setNewStoreProductPrice(event) {
-        this.viewModel.selectedNewProductInStoreToChangePrice.price = event.target.value
+        this.viewModel.selectedProductsInNewStore.find(product => this.viewModel.selectedNewProductInStoreToChangePrice.id === product.id).price = event.target.value
       },
       sumOffers() {
         this.viewModel.sumOfOffersAdditionalCost =
