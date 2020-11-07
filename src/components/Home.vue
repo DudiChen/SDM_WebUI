@@ -135,6 +135,7 @@
         console.log(this.viewModel.selectedProductsInNewStore.find(product => this.viewModel.selectedNewProductInStoreToChangePrice.id === product.id))
         this.viewModel.selectedProductsInNewStore.find(product => this.viewModel.selectedNewProductInStoreToChangePrice.id === product.id).price = event.value
         this.viewModel.selectedProductsInNewStoreForSend = JSON.stringify(this.viewModel.selectedProductsInNewStore)
+        this.viewModel.selectedNewProductInStoreToChangePrice.price = event.vaule
       },
       sumOffers() {
         this.viewModel.sumOfOffersAdditionalCost =
