@@ -54,6 +54,11 @@
     },
     components: {},
     methods: {
+      validateRole() {
+        if(this.viewModel.role !== 'seller') {
+          this.viewModel.role = 'consumer'
+        }
+      },
       updateProductChoise() {
         if(this.viewModel.productQuantity === 0) {
           return 
@@ -83,7 +88,8 @@
       },
       confirmDiscountAllOrNothing() {
         // check if the chosen offers for the discount list is initialized already or not
-        if (!this.viewModel.selectedDiscounts[this.viewModel.selectedDiscount.name].length ||
+        if (!this.viewModel.selectedDiscounts[this.viewModel.selectedDiscount.name] ||
+          !this.viewModel.selectedDiscounts[this.viewModel.selectedDiscount.name].length ||
           !(this.viewModel.selectedDiscounts[this.viewModel.selectedDiscount.name] instanceof Array)) {
           this.viewModel.selectedDiscounts[this.viewModel.selectedDiscount.name] = []
         }
@@ -92,14 +98,17 @@
         this.viewModel.selectedDiscountsStringified = JSON.stringify(this.viewModel.selectedDiscounts)
       },
       confirmDiscountOneOf() {
+        console.log("hey")
         // check if the chosen offers for the discount list is initialized already or not
-        if (!this.viewModel.selectedDiscounts[this.viewModel.selectedDiscount.name].length ||
+        if (!this.viewModel.selectedDiscounts[this.viewModel.selectedDiscount.name] || 
+          !this.viewModel.selectedDiscounts[this.viewModel.selectedDiscount.name].length ||
           !(this.viewModel.selectedDiscounts[this.viewModel.selectedDiscount.name] instanceof Array)) {
           this.viewModel.selectedDiscounts[this.viewModel.selectedDiscount.name] = []
         }
         this.viewModel.selectedDiscounts[this.viewModel.selectedDiscount.name].push(this.viewModel.selectedOffer
           .productId);
         this.viewModel.selectedDiscountsStringified = JSON.stringify(this.viewModel.selectedDiscounts)
+        console.log(this.viewModel.selectedDiscountsStringified)
       },
       clearOrderAndDiscounts() {
         this.viewModel.selectedDiscounts = new Map()
@@ -130,15 +139,17 @@
       },
       stringifyDate() {
         const d = this.viewModel.transactionDate
+        console.log(d)
         const dformat = [
           d.getDate(),
           d.getMonth() + 1,
           d.getFullYear()
-        ].join('/') + ' ' + [d.getHours(),
-          d.getMinutes(),
-          d.getSeconds()
-        ].join(':');
+        ] //.join('/') + ' ' + [d.getHours(),
+          //d.getMinutes(),
+          //d.getSeconds()
+        //].join(':');
         this.viewModel.stringifiedTransactionDate = dformat
+        console.log(this.viewModel.stringifiedTransactionDate)
       },
       onOrderDateChanged() {
         const d = this.viewModel.orderDate
@@ -146,10 +157,10 @@
           d.getDate(),
           d.getMonth() + 1,
           d.getFullYear()
-        ].join('/') + ' ' + [d.getHours(),
-          d.getMinutes(),
-          d.getSeconds()
-        ].join(':');
+        ] //.join('/') + ' ' + [d.getHours(),
+          //d.getMinutes(),
+          //d.getSeconds()
+        //].join(':');
         this.viewModel.stringifiedOrderDate = dformat
       },
       connectToSocket() {
