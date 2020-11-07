@@ -131,6 +131,11 @@
           this.viewModel.selectedProductsInNewStoreForSend = JSON.stringify(this.viewModel.selectedProductsInNewStore)
         }
       },
+      setNewStoreProductPrice(event) {
+        console.log(this.viewModel.selectedProductsInNewStore.find(product => this.viewModel.selectedNewProductInStoreToChangePrice.id === product.id))
+        this.viewModel.selectedProductsInNewStore.find(product => this.viewModel.selectedNewProductInStoreToChangePrice.id === product.id).price = event.value
+        this.viewModel.selectedProductsInNewStoreForSend = JSON.stringify(this.viewModel.selectedProductsInNewStore)
+      },
       sumOffers() {
         this.viewModel.sumOfOffersAdditionalCost =
           this.viewModel.selectedDiscount.offers
